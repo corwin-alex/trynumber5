@@ -1,4 +1,4 @@
-const pool = require('./db');
+const { pool } = require('./db');
 
 const createTables = async () => {
   const createUsersTable = `
@@ -69,8 +69,10 @@ const createTables = async () => {
     );
     console.log('Администратор по умолчанию создан (логин: admin, пароль: admin123)');
 
+    console.log('Все таблицы успешно созданы и настроены');
   } catch (error) {
     console.error('Ошибка создания таблиц:', error);
+    throw error;
   }
 };
 
