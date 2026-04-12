@@ -38,7 +38,6 @@ const ensureDatabaseExists = async () => {
       console.log(`База данных "${dbName}" уже существует`);
     }
     
-    await adminPool.end();
     return true;
   } catch (error) {
     console.error('Ошибка при создании базы данных:', error);

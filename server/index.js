@@ -3,7 +3,6 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-const { ensureDatabaseExists } = require('./db');
 const createTables = require('./createTables');
 const authRoutes = require('./routes/auth');
 const { router: testRoutes } = require('./routes/tests');
@@ -17,9 +16,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Инициализация базы данных и таблиц при запуске сервера
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/tests', testRoutes);
+app.use('/api/results', resultRoutes);
+
+// Инициализация базы данных и таблиц при запуске сервера (асинхронно, не блокируя сервер)
 const initializeDatabase = async () => {
   try {
+    const { ensureDatabaseExists } = require('./db');
+    
     // Сначала создаем базу данных если она не существует
     await ensureDatabaseExists();
     
@@ -32,16 +38,11 @@ const initializeDatabase = async () => {
     console.log('База данных успешно инициализирована');
   } catch (error) {
     console.error('Ошибка инициализации базы данных:', error);
-    process.exit(1);
+    // Не завершаем процесс, чтобы сервер продолжил работать
   }
 };
 
 initializeDatabase();
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/tests', testRoutes);
-app.use('/api/results', resultRoutes);
 
 // Раздача статических файлов в продакшене
 if (process.env.NODE_ENV === 'production') {
