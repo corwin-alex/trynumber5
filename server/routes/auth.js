@@ -41,7 +41,9 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Ошибка регистрации:', error);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Ошибка сервера при регистрации' });
+    }
   }
 });
 
@@ -86,7 +88,9 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Ошибка входа:', error);
-    res.status(500).json({ message: 'Ошибка сервера' });
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Ошибка сервера при входе' });
+    }
   }
 });
 
