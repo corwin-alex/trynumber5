@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../App';
 
-const API_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
+// const API_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
+const API_URL = process.env.API_URL;
 
 function AdminPanel() {
   const [tests, setTests] = useState([]);
