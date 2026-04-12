@@ -63,7 +63,7 @@ const createTables = async () => {
     
     await pool.query(
       `INSERT INTO users (username, password, role) 
-       SELECT $1, $2, $3 
+       SELECT $1::VARCHAR, $2::VARCHAR, $3::VARCHAR 
        WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = $1)`,
       ['admin', adminPassword, 'admin']
     );
