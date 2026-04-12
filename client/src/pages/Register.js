@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-// const API_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
-const API_URL = process.env.API_URL;
+// В production используем relative URL (тот же домен), в development - localhost
+const API_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
 
 function Register() {
   const [username, setUsername] = useState('');
