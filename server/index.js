@@ -24,13 +24,16 @@ app.use('/api/results', resultRoutes);
 // Инициализация базы данных и таблиц при запуске сервера (асинхронно, не блокируя сервер)
 const initializeDatabase = async () => {
   try {
-    const { ensureDatabaseExists } = require('./db');
-    
-    // Сначала создаем базу данных если она не существует
-    await ensureDatabaseExists();
-    
-    // Небольшая задержка чтобы база данных успела полностью инициализироваться
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Создаем базу данных только если используется локальная конфигурация (не DATABASE_URL)
+    if (!process.env.DATABASE_URL) {
+      const { ensureDatabaseExists } = require('./db');
+      
+      // Сначала создаем базу данных если она не существует
+      await ensureDatabaseExists();
+      
+      // Небольшая задержка чтобы база данных успела полностью инициализироваться
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
     
     // Создаем таблицы
     await createTables();
