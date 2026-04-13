@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
   
   // Catch-all route для SPA должен быть ПОСЛЕ всех API routes
-  app.get('*', (req, res) => {
+  app.get('/*path', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
   });
 }
