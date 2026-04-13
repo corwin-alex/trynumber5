@@ -7,7 +7,6 @@ const createTables = require('./createTables');
 const authRoutes = require('./routes/auth');
 const { router: testRoutes } = require('./routes/tests');
 const resultRoutes = require('./routes/results');
-const { checkDatabaseConnection } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,8 +24,13 @@ app.use('/api/results', resultRoutes);
 // Инициализация базы данных и таблиц при запуске сервера (асинхронно, не блокируя сервер)
 const initializeDatabase = async () => {
   try {
-    // Проверяем подключение к базе данных
-    await checkDatabaseConnection();
+    const { ensureDatabaseExists } = require('./db');
+    
+    // Сначала создаем базу данных если она не существует
+    await ensureDatabaseExists();
+    
+    // Небольшая задержка чтобы база данных успела полностью инициализироваться
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Создаем таблицы
     await createTables();
