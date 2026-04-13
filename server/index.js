@@ -50,18 +50,17 @@ initializeDatabase();
 // Раздача статических файлов в продакшене
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
-  
+}
 
+// Catch-all route для SPA должен быть ПОСЛЕ всех API routes
+app.get('/*path', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 // Обработка ошибок должна быть ПОСЛЕ всех маршрутов
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Что-то пошло не так!' });
-    // Catch-all route для SPA должен быть ПОСЛЕ всех API routes
-  app.get('/*path', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-  });
-}
 });
 
 app.listen(PORT, () => {
