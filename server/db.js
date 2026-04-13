@@ -1,46 +1,27 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Пул для подключения к postgres (без указания конкретной БД)
-const adminPool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: 'postgres', // Подключаемся к системной БД postgres
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-});
-
-// Пул для подключения к нашей БД
+// Единый пул для подключения к нашей БД
+// Для Render.com используйте переменные окружения из панели управления
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST || process.env.PGHOST,
+  port: process.env.DB_PORT || process.env.PGPORT || 5432,
+  database: process.env.DB_NAME || process.env.PGDATABASE,
+  user: process.env.DB_USER || process.env.PGUSER,
+  password: process.env.DB_PASSWORD || process.env.PGPASSWORD,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-// Функция создания базы данных если она не существует
-const ensureDatabaseExists = async () => {
-  const dbName = process.env.DB_NAME;
-  
+// Функция проверки подключения к базе данных
+const checkDatabaseConnection = async () => {
   try {
-    // Проверяем существует ли база данных
-    const checkResult = await adminPool.query(
-      'SELECT 1 FROM pg_database WHERE datname = $1',
-      [dbName]
-    );
-    
-    if (checkResult.rows.length === 0) {
-      // База данных не существует, создаем её
-      await adminPool.query(`CREATE DATABASE ${dbName}`);
-      console.log(`База данных "${dbName}" успешно создана`);
-    } else {
-      console.log(`База данных "${dbName}" уже существует`);
-    }
-    
+    const client = await pool.connect();
+    await client.query('SELECT NOW()');
+    client.release();
+    console.log('Подключение к базе данных успешно');
     return true;
   } catch (error) {
-    console.error('Ошибка при создании базы данных:', error);
+    console.error('Ошибка подключения к базе данных:', error.message);
     throw error;
   }
 };
@@ -49,4 +30,4 @@ pool.on('connect', () => {
   console.log('База данных подключена');
 });
 
-module.exports = { pool, ensureDatabaseExists };
+module.exports = { pool, checkDatabaseConnection };
